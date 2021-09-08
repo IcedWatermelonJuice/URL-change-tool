@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+		<meta name="referrer" content="never" />
+		<title>地址转换工具</title>
+		<script src="./new_file.js"></script>
+		<style>
+			body {
+				font-size: 18px;
+				background-size: 100%;
+				background-position: top center;
+				background-repeat: no-repeat;
+				background-attachment: fixed;
+			}
+			#top_box {
+				height: 100%;
+				max-width: 768px;
+				margin: 0 auto;
+				position: relative;
+			}
+
+			#tittle {
+				display: block;
+				width: 100%;
+				font-size: 28px;
+				margin: 30px 0;
+				text-align: center;
+			}
+
+			#main {
+				display: block;
+				width: 100%;
+			}
+			.url_box {
+				width: 670px;
+			}
+
+			button {
+				display: block;
+				margin: 0 auto;
+				font-size: 18px;
+			}
+			#tips {
+				display: block;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="top_box">
+			<div id="tittle">
+				<p>地址转换工具</p>
+			</div>
+			<div id="main">
+				<p>
+					<span>原始地址: </span>
+					<input type="text" id="origin_url_box" class="url_box" />
+				</p>
+				<button onclick="changeUrl()">原始地址转换</button>
+				<p>
+					<span>真实地址: </span>
+					<input type="text" id="origin_url_box" class="url_box" />
+				</p>
+				<button onclick="copyUrl()">复制真实地址</button>
+			</div>
+			<div id="tips">
+				<li>(1)本工具仅供学习交流使用,切勿商用!</li>
+				<li>(2)本工具能将下载器的专有地址转换成真实地址，支持迅雷、快车、旋风</li>
+				<li>(3)本工具js脚本改自https://greasyfork.org/zh-CN/scripts/30884</li>
+				<li>(4)Github:https://github.com/IcedWatermelonJuice/URL-change-tool</li>
+				<li>(5)Gitee:https://gitee.com/gem_xl/URL-change-tool</li>
+			</div>
+		</div>
+	</body>
+</html>
