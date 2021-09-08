@@ -8,12 +8,14 @@
 		<script src="./new_file.js"></script>
 		<style>
 			body {
+				color:black;
 				font-size: 18px;
 				background-size: 100%;
 				background-position: top center;
 				background-repeat: no-repeat;
 				background-attachment: fixed;
 			}
+
 			#top_box {
 				height: 100%;
 				max-width: 768px;
@@ -33,6 +35,7 @@
 				display: block;
 				width: 100%;
 			}
+
 			.url_box {
 				width: 670px;
 			}
@@ -41,10 +44,19 @@
 				display: block;
 				margin: 0 auto;
 				font-size: 18px;
+				cursor: pointer;
 			}
 			#tips {
 				display: block;
 				width: 100%;
+				margin-top: 25px;
+				padding: 10px;
+				border: 1px solid;
+				border-radius: 3px;
+			}
+			a{
+				text-decoration: none;
+				color:black;
 			}
 		</style>
 	</head>
@@ -66,11 +78,21 @@
 				<button onclick="copyUrl()">复制真实地址</button>
 			</div>
 			<div id="tips">
+				<p style="margin: 0;">特别声明:</p>
 				<li>(1)本工具仅供学习交流使用,切勿商用!</li>
 				<li>(2)本工具能将下载器的专有地址转换成真实地址，支持迅雷、快车、旋风</li>
-				<li>(3)本工具js脚本改自https://greasyfork.org/zh-CN/scripts/30884</li>
-				<li>(4)Github:https://github.com/IcedWatermelonJuice/URL-change-tool</li>
-				<li>(5)Gitee:https://gitee.com/gem_xl/URL-change-tool</li>
+				<li>(3)本工具js脚本改自:<a
+						href="https://greasyfork.org/zh-CN/scripts/30884">https://greasyfork.org/zh-CN/scripts/30884</a>
+				</li>
+				<li>(4)本工具在线使用地址:<a
+						href="https://icedwatermelonjuice.github.io/URL-change-tool">https://icedwatermelonjuice.github.io/URL-change-tool</a>
+				</li>
+				<li>(5)Github:<a
+						href="https://github.com/IcedWatermelonJuice/URL-change-tool">https://github.com/IcedWatermelonJuice/URL-change-tool</a>
+				</li>
+				<li>(6)Gitee:<a
+						href="https://gitee.com/gem_xl/URL-change-tool">https://gitee.com/gem_xl/URL-change-tool</a>
+				</li>
 			</div>
 		</div>
 	</body>
