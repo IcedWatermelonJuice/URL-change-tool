@@ -291,6 +291,8 @@
 		if(real_url!==false){
 			if(real_url!==origin_url){
 				document.getElementById("real_url_box").value = real_url;
+				console.log("real_url");
+				alert("转换成功!");
 			}
 		}
 	}
