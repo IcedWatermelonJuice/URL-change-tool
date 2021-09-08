@@ -18,6 +18,24 @@
 				<p>
 					<span>输入地址: </span>
 					<input type="text" id="origin_url_box" class="url_box" />
+					<script>
+					var oub=document.getElementById("origin_url_box");
+					var initvalue="请输入http、https、thunder、Fastget、qqdl开头的地址";
+					oub.value=initvalue;
+					oub.style.color="gray";
+					oub.onfocus=function(){
+						if(oub.value===initvalue){
+							oub.value="";
+							oub.style.color="";
+						}
+					}
+					oub.onblur=function(){
+						if(!oub.value){
+							oub.value=initvalue;
+							oub.style.color="gray";
+						}
+					}
+					</script>
 				</p>
 				<p style="display: flex;">
 					<span>转换方向: </span>
