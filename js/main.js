@@ -83,11 +83,27 @@ function createLink(url) {
 	UrlBox.qqdlUrl = qqdlEncode(UrlBox.realUrl);
 	return UrlBox;
 }
+//
+function checkUrl(url){
+	var res=false;
+	if(url.search("https://")===0){
+		res=true;
+	}else if(url.search("http://")===0){
+		res=true;
+	}else if(url.search("thunder://")===0){
+		res=true;
+	}else if(url.search("Flashget://")===0){
+		res=true;
+	}else if(url.search("qqdl://")===0){
+		res=true;
+	}
+	return res;
+}
 //转换URL
 function changeUrl(mode) {
 	var origin_url = document.getElementById("origin_url_box").value;
 	origin_url = origin_url.trim();
-	if (origin_url !== "") {
+	if (checkUrl(origin_url)) {
 		echoState("转换中.");
 		var new_url = createLink(origin_url);
 		echoState("转换中..");
@@ -112,7 +128,7 @@ function changeUrl(mode) {
 			document.getElementById("copyBtn").style.display="";
 		}
 	} else {
-		alert('URL地址不能为空!');
+		echoState("转换失败(输入地址错误)!","red");
 	}
 }
 //复制到剪贴板
@@ -123,7 +139,7 @@ function copyUrl() {
 }
 //初始化工具
 function initTool() {
-	document.getElementById("origin_url_box").value = "";
+	document.getElementById("origin_url_box").value = "请输入http、https、thunder、Fastget、qqdl开头的地址";
 	document.getElementById("res_url_box").value = "";
 	document.getElementById("copyBtn").style.display="none";
 	echoState("未运行");
