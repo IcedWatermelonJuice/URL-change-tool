@@ -52,17 +52,20 @@ function realEncode(url) {
 }
 //编码短链
 function shortEncode(url) {
-	url = encodeURIComponent(url);
+	var shortInterFace = "http://xnz.pub/apis.php?url=";//短链接口
 	var shortUrl;
 	$.ajax({
 		type: "get",
-		url: "http://xnz.pub/apis.php?url=" + url,
+		url: "https://bird.ioliu.cn/v2?url=" + shortInterFace + url,
 		async: false, //必须同步执行
 		error: function(xhr) {
 			alert("短链接口错误!\n" + "错误代码:" + xhr.status + "\n错误提示:" + xhr.statusText + "\n请联系开发者更换短链接口");
 			shortUrl = false;
 		},
 		success: function(res) {
+			if (typeof res === "string") {
+				res = JSON.parse(res);//防止get到的数据不是json格式
+			}
 			shortUrl = "http://xnz.pub/" + res.result.shorten;
 		}
 	})
