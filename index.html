@@ -7,6 +7,7 @@
 		<title>地址转换工具</title>
 		<link rel="icon" type="image/x-icon" href="./img/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="./css/main.css" />
+		<script src="./js/jquery.js"></script>
 		<script src="./js/main.js"></script>
 	</head>
 	<body>
@@ -19,27 +20,28 @@
 					<span>输入地址: </span>
 					<input type="text" id="origin_url_box" class="url_box" />
 					<script>
-					var oub=document.getElementById("origin_url_box");
-					var initvalue="请输入http、https、thunder、Fastget、qqdl开头的地址";
-					oub.value=initvalue;
-					oub.style.color="gray";
-					oub.onfocus=function(){
-						if(oub.value===initvalue){
-							oub.value="";
-							oub.style.color="";
+						var oub = document.getElementById("origin_url_box");
+						var initvalue = "请输入http、https、thunder、Fastget、qqdl开头的地址";
+						oub.value = initvalue;
+						oub.style.color = "gray";
+						oub.onfocus = function() {
+							if (oub.value === initvalue) {
+								oub.value = "";
+								oub.style.color = "";
+							}
 						}
-					}
-					oub.onblur=function(){
-						if(!oub.value){
-							oub.value=initvalue;
-							oub.style.color="gray";
+						oub.onblur = function() {
+							if (!oub.value) {
+								oub.value = initvalue;
+								oub.style.color = "gray";
+							}
 						}
-					}
 					</script>
 				</p>
 				<p style="display: flex;">
 					<span>转换方向: </span>
 					<button onclick="changeUrl('real')">原始地址</button>
+					<button onclick="changeUrl('short')">短链地址</button>
 					<button onclick="changeUrl('thunder')">迅雷地址</button>
 					<button onclick="changeUrl('flashget')">快车地址</button>
 					<button onclick="changeUrl('qqdl')">Q旋地址</button>
@@ -57,19 +59,17 @@
 
 			</div>
 			<div id="tips">
-				<p style="margin: 0;">特别声明:</p>
+				<p style="margin: 0;">注意事项:</p>
 				<li>(1)本工具仅供学习交流使用,切勿商用!</li>
-				<li>(2)本工具能将迅雷、快车、Q旋专有地址与原始地址间相互转换</li>
-				<li>(3)本工具js脚本改自:<a
-						href="https://greasyfork.org/zh-CN/scripts/30884">https://greasyfork.org/zh-CN/scripts/30884</a>
-				</li>
+				<li>(2)本工具能将迅雷、快车、Q旋专有地址与原始地址、短链地址间相互转换</li>
+				<li>(3)本工具短链接口(<a href="http://xnz.pub/web/index.html">xnz.pub</a>)由互联网上收集整理,不保证能安全稳定使用</li>
 				<li>(4)本工具在线使用地址:<a
 						href="https://icedwatermelonjuice.github.io/URL-change-tool">https://icedwatermelonjuice.github.io/URL-change-tool</a>
 				</li>
-				<li>(5)Github:<a
+				<li>(5)Github仓库地址:<a
 						href="https://github.com/IcedWatermelonJuice/URL-change-tool">https://github.com/IcedWatermelonJuice/URL-change-tool</a>
 				</li>
-				<li>(6)Gitee:<a
+				<li>(6)Gitee仓库地址:<a
 						href="https://gitee.com/gem_xl/URL-change-tool">https://gitee.com/gem_xl/URL-change-tool</a>
 				</li>
 			</div>
