@@ -86,6 +86,21 @@ function qqdlEncode(url) {
 	var qqdlUrl = 'qqdl://' + btoa(url);
 	return qqdlUrl;
 }
+//猫咪转译
+function maomiConvert(url){
+	if(url.search("mmxzxl1.com")!==-1){
+		var msg="检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
+		var c_res=confirm(msg);
+		if(c_res){
+			var flag0=url.search("maomi/")+"maomi/".length;
+        	var flag1=url.lastIndexOf("/");
+        	var newUrl=url.slice(flag0,flag1);
+        	newUrl="https://s2s.baimi0517.com/common/maomi/"+newUrl+"/hls/1/index.m3u8";
+        	return newUrl;
+    	}
+	}
+	return url;
+}
 //URL检错
 function checkUrl(url) {
 	var res = false;
@@ -110,6 +125,7 @@ function changeUrl(mode) {
 	echoState("转换中.");
 	if (checkUrl(origin_url)) {
 		var realUrl = realEncode(origin_url);
+		realUrl=maomiConvert(realUrl);
 		echoState("转换中..");
 		var res_url = "";
 		if (mode === "real") {
