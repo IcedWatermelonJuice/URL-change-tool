@@ -52,7 +52,7 @@ function realEncode(url) {
 }
 //编码短链
 function shortEncode(url) {
-	var shortInterFace = "http://xnz.pub/apis.php?url=";//短链接口
+	var shortInterFace = "http://xnz.pub/apis.php?url="; //短链接口
 	var shortUrl;
 	$.ajax({
 		type: "get",
@@ -64,7 +64,7 @@ function shortEncode(url) {
 		},
 		success: function(res) {
 			if (typeof res === "string") {
-				res = JSON.parse(res);//防止get到的数据不是json格式
+				res = JSON.parse(res); //防止get到的数据不是json格式
 			}
 			shortUrl = "http://xnz.pub/" + res.result.shorten;
 		}
@@ -86,46 +86,62 @@ function qqdlEncode(url) {
 	var qqdlUrl = 'qqdl://' + btoa(url);
 	return qqdlUrl;
 }
-//猫咪转译
-function maomiConvert(url){
-	if(url.search("mmxzxl1.com")!==-1){
-		var msg="检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
-		var c_res=confirm(msg);
-		if(c_res){
-			var flag0=url.search("maomi/")+"maomi/".length;
-        	var flag1=url.lastIndexOf("/");
-        	var newUrl=url.slice(flag0,flag1);
-        	newUrl="https://s2s.baimi0517.com/common/maomi/"+newUrl+"/hls/1/index.m3u8";
-        	return newUrl;
-    	}
+//猫咪转译(小彩蛋)
+function maomiConvert(url) {
+	if (url.search("mmxzxl1.com") !== -1) {
+		var msg = "检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
+		var c_res = confirm(msg);
+		if (c_res) {
+			var flag0 = url.search("maomi/") + "maomi/".length;
+			var flag1 = url.lastIndexOf("/");
+			var newUrl = url.slice(flag0, flag1);
+			newUrl = "https://s2s.baimi0517.com/common/maomi/" + newUrl + "/hls/1/index.m3u8";
+			return newUrl;
+		}
 	}
 	return url;
 }
 //URL检错
 function checkUrl(url) {
-	var res = false;
+	var resFlag = false;
+	var resUrl="";
 	if (url.search("https://") === 0) {
-		res = true;
+		resFlag = true;
+		resUrl=url;
 	} else if (url.search("http://") === 0) {
-		res = true;
+		resFlag = true;
+		resUrl=url;
 	} else if (url.search("thunder://") === 0) {
-		res = true;
+		resFlag = true;
+		resUrl=url;
 	} else if (url.search("Flashget://") === 0) {
-		res = true;
+		resFlag = true;
+		resUrl=url;
 	} else if (url.search("qqdl://") === 0) {
-		res = true;
+		resFlag = true;
+		resUrl=url;
+	} else if (url.search("QUFodHRw") === 0) {
+		resFlag = true;
+		resUrl="thunder://"+url;
+	} else if (url.search("W0ZMQVNIR0VUXWh0dH") === 0) {
+		resFlag = true;
+		resUrl="Flashget://"+url;
+	} else if (url.search("aHR0c") === 0) {
+		resFlag = true;
+		resUrl="qqdl://"+url;
 	}
-	return res;
+	return [resFlag,resUrl];
 }
 //转换URL
 function changeUrl(mode) {
 	echoState("转换中");
 	var origin_url = document.getElementById("origin_url_box").value;
 	origin_url = origin_url.trim();
+	var checkRes=checkUrl(origin_url);
 	echoState("转换中.");
-	if (checkUrl(origin_url)) {
-		var realUrl = realEncode(origin_url);
-		realUrl=maomiConvert(realUrl);
+	if (checkRes[0]) {
+		var realUrl = realEncode(checkRes[1]);
+		realUrl = maomiConvert(realUrl);
 		echoState("转换中..");
 		var res_url = "";
 		if (mode === "real") {
@@ -167,6 +183,7 @@ function initTool() {
 	document.getElementById("origin_url_box").value = "请输入http、https、thunder、Fastget、qqdl开头的地址";
 	document.getElementById("res_url_box").value = "";
 	document.getElementById("copyBtn").style.display = "none";
+	console.log("转换工具初始化");
 	echoState("未运行");
-	alert("转换工具初始化成功!")
+	alert("转换工具初始化成功!");
 }
