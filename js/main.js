@@ -1,11 +1,12 @@
 //反馈运行状态
 function echoState(str, fcolor) {
-	document.getElementById("run_state").innerText = str;
+	var runState = $("#run_state");
+	runState.text(str);
 	try {
 		if (fcolor) {
-			document.getElementById("run_state").style.color = fcolor;
+			runState.css("color", fcolor);
 		} else {
-			document.getElementById("run_state").style.color = "";
+			runState.css("color", "");
 		}
 
 	} catch (e) {
@@ -56,7 +57,7 @@ function shortEncode(url) {
 	var shortUrl;
 	$.ajax({
 		type: "get",
-		url: "https://bird.ioliu.cn/v2?url=" + shortInterFace + url,
+		url: shortInterFace + url,
 		async: false, //必须同步执行
 		error: function(xhr) {
 			alert("短链接口错误!\n" + "错误代码:" + xhr.status + "\n错误提示:" + xhr.statusText + "\n请联系开发者更换短链接口");
@@ -86,7 +87,7 @@ function qqdlEncode(url) {
 	var qqdlUrl = 'qqdl://' + btoa(url);
 	return qqdlUrl;
 }
-//猫咪转译(小彩蛋)
+//猫咪转译(隐藏功能)
 function maomiConvert(url) {
 	if (url.search("mmxzxl1.com") !== -1) {
 		var msg = "检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
@@ -104,66 +105,74 @@ function maomiConvert(url) {
 //URL检错
 function checkUrl(url) {
 	var resFlag = false;
-	var resUrl="";
+	var resUrl = "";
 	if (url.search("https://") === 0) {
 		resFlag = true;
-		resUrl=url;
+		resUrl = url;
 	} else if (url.search("http://") === 0) {
 		resFlag = true;
-		resUrl=url;
+		resUrl = url;
 	} else if (url.search("thunder://") === 0) {
 		resFlag = true;
-		resUrl=url;
+		resUrl = url;
 	} else if (url.search("Flashget://") === 0) {
 		resFlag = true;
-		resUrl=url;
+		resUrl = url;
 	} else if (url.search("qqdl://") === 0) {
 		resFlag = true;
-		resUrl=url;
+		resUrl = url;
 	} else if (url.search("QUFodHRw") === 0) {
 		resFlag = true;
-		resUrl="thunder://"+url;
+		resUrl = "thunder://" + url;
 	} else if (url.search("W0ZMQVNIR0VUXWh0dH") === 0) {
 		resFlag = true;
-		resUrl="Flashget://"+url;
+		resUrl = "Flashget://" + url;
 	} else if (url.search("aHR0c") === 0) {
 		resFlag = true;
-		resUrl="qqdl://"+url;
+		resUrl = "qqdl://" + url;
 	}
-	return [resFlag,resUrl];
+	return [resFlag, resUrl];
 }
 //转换URL
 function changeUrl(mode) {
 	echoState("转换中");
-	var origin_url = document.getElementById("origin_url_box").value;
+	var origin_url = $("#origin_url_box").val();
 	origin_url = origin_url.trim();
-	var checkRes=checkUrl(origin_url);
+	var checkRes = checkUrl(origin_url);
 	echoState("转换中.");
 	if (checkRes[0]) {
 		var realUrl = realEncode(checkRes[1]);
-		realUrl = maomiConvert(realUrl);
+		if (activeFlag) {
+			realUrl = maomiConvert(realUrl);
+		}
 		echoState("转换中..");
 		var res_url = "";
-		if (mode === "real") {
-			res_url = realUrl;
-		} else if (mode === "short") {
-			res_url = shortEncode(realUrl);
-		} else if (mode === "thunder") {
-			res_url = thunderEncode(realUrl);
-		} else if (mode === "flashget") {
-			res_url = flashgetEncode(realUrl);
-		} else if (mode === "qqdl") {
-			res_url = qqdlEncode(realUrl);
-		} else {
-			echoState("转换失败(转换模式错误,请刷新页面或反馈给开发者)!", "red");
-			return false;
+		switch (mode) {
+			case "real":
+				res_url = realUrl;
+				break;
+			case "short":
+				res_url = shortEncode(realUrl);
+				break;
+			case "thunder":
+				res_url = thunderEncode(realUrl);
+				break;
+			case "flashget":
+				res_url = flashgetEncode(realUrl);
+				break;
+			case "qqdl":
+				res_url = qqdlEncode(realUrl);
+				break;
+			default:
+				echoState("转换失败(转换模式错误,请刷新页面或反馈给开发者)!", "red");
+				return false;
 		}
 		echoState("转换中...");
 		if (typeof res_url === "string") {
-			document.getElementById("res_url_box").value = res_url;
+			$("#res_url_box").val(res_url);
 			console.log("输入地址:" + origin_url + "\n转换结果:" + res_url);
 			echoState("转换成功!", "green");
-			document.getElementById("copyBtn").style.display = "";
+			$("#copyBtn").css("display", "");
 		} else {
 			echoState("转换失败!", "red");
 		}
@@ -174,16 +183,36 @@ function changeUrl(mode) {
 }
 //复制到剪贴板
 function copyUrl() {
-	document.getElementById("res_url_box").select();
+	$("#res_url_box").select();
 	document.execCommand('copy');
 	alert("已复制到剪贴板!");
 }
 //初始化工具
 function initTool() {
-	document.getElementById("origin_url_box").value = "请输入http、https、thunder、Fastget、qqdl开头的地址";
-	document.getElementById("res_url_box").value = "";
-	document.getElementById("copyBtn").style.display = "none";
-	console.log("转换工具初始化");
+	$("#origin_url_box").val("请输入http、https、thunder、Fastget、qqdl开头的地址");
+	$("#origin_url_box").css("color", "gray");
+	$("#res_url_box").val("");
+	$("#copyBtn").css("display", "none");
+	var msg = "转换工具初始化";
+	if (activeFlag) {
+		msg += ",隐藏功能已失效"
+		activeFlag = false;
+	}
+	console.log(msg);
+	alert(msg);
 	echoState("未运行");
-	alert("转换工具初始化成功!");
 }
+var clickNum = 0;
+var activeFlag = false;
+$(document).ready(function() {
+	$("#tittle").click(function() {
+		clickNum += 1;
+		if (clickNum >= 6) {
+			var msg = "已激活隐藏功能,刷新网页/初始化工具后失效";
+			alert(msg);
+			console.log(msg);
+			activeFlag = true;
+			clickNum = 0;
+		}
+	});
+});
