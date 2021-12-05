@@ -14,14 +14,14 @@ function echoState(str, fcolor) {
 	}
 
 }
-// 解码迅雷
+//解码迅雷
 function thunderDecode(url) {
 	url = url.replace('thunder://', '');
 	var res = atob(url);
 	res = res.substr(2, res.length - 4);
 	return res;
 }
-// 解码快车
+//解码快车
 function flashgetDecode(url) {
 	url = url.replace('Flashget://', '');
 	if (url.search('&') != -1) {
@@ -32,7 +32,7 @@ function flashgetDecode(url) {
 	res = res.replace('[FLASHGET]', ''); //两层[FLASHGET]都要去掉
 	return res;
 }
-// 解码Q旋
+//解码Q旋
 function qqdlDecode(url) {
 	url = url.replace('qqdl://', '');
 	var res = atob(url);
@@ -53,8 +53,10 @@ function realEncode(url) {
 }
 //编码短链
 function shortEncode(url) {
-	var shortInterFace = "http://xnz.pub/apis.php?url="; //短链接口
+	var shortInterFace = "xnz.pub/apis.php?url="; //短链接口
 	var shortUrl;
+	var protocol=/http|https/i.test(location.protocol)?location.protocol:"https:";
+	shortInterFace=protocol+"//"+shortInterFace.replace(/^((http|https):)?\/\//,"");
 	$.ajax({
 		type: "get",
 		url: shortInterFace + url,
@@ -67,7 +69,7 @@ function shortEncode(url) {
 			if (typeof res === "string") {
 				res = JSON.parse(res); //防止get到的数据不是json格式
 			}
-			shortUrl = "http://xnz.pub/" + res.result.shorten;
+			shortUrl = "https://xnz.pub/" + res.result.shorten;
 		}
 	})
 	return shortUrl
@@ -87,7 +89,7 @@ function qqdlEncode(url) {
 	var qqdlUrl = 'qqdl://' + btoa(url);
 	return qqdlUrl;
 }
-//猫咪转译(隐藏功能)
+//猫咪转译
 function maomiConvert(url) {
 	if (url.search("mmxzxl1.com") !== -1) {
 		var msg = "检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
@@ -202,17 +204,125 @@ function initTool() {
 	alert(msg);
 	echoState("未运行");
 }
+//跳转到其他网页
+function jumpSite(url){
+	if(!activeFlag){
+		return false;
+	}
+	var errorMsg;
+	switch (url){
+		case "play":
+			errorMsg="1、请先转换为真实地址再点击在线播放\n2、在线播放仅支持m3u8、flv、mp4、webm、ogg格式";
+			url="https://icedwatermelonjuice.github.io/Online-Player?url=";
+			let videoUrl=$("#res_url_box").val();
+			url=/.(m3u8|flv|mp4|webm|ogg)/i.test(videoUrl)?url+videoUrl:"";
+			break;
+		case "dns":
+			errorMsg="1、请先转换为真实地址再点击DNS解析\n2、若转换为短链地址，解析结果为短链接口的DNS解析结果";
+			url="https://icedwatermelonjuice.github.io/DND-Parse?url=";
+			let siteUrl=$("#res_url_box").val();
+			url=!/^(thunder|Flashget|qqdl):\/\//i.test(siteUrl)?url+siteUrl:"";
+			break;
+		default:
+			errorMsg="jumpSite(url)参数缺失或错误";
+			url=url.trim();
+			break;
+	}
+	if(url){
+		open(url);
+	}else{
+		alert(errorMsg);
+		console.log(errorMsg);
+	}
+}
+//从URL获取数据
+function fromUrl(keys){
+	if(!keys||typeof keys!=="string"){
+		return false;
+	}
+	var queryData=location.search;
+	if(!queryData){
+		return false;
+	}
+	queryData=queryData.slice(1).split("&");
+	var queryJson={};
+	for(let i in queryData){
+		let dataArray=queryData[i].split("=");
+		if(dataArray[0]){
+			queryJson[dataArray[0]]=dataArray[1]?dataArray[1]:"";
+		}
+	}
+	keys=keys.split(",");
+	if(keys.length===1){
+		return queryJson[keys[0]];
+	}else{
+		var res={};
+		for(let i in keys){
+			res[keys[i]]=queryJson[keys[i]];
+		}
+		return res;
+	}
+}
+//激活隐藏功能
+function unhideFn(){
+	activeFlag = true;
+	$("#playBtn").css("display","");
+	$("#dnsBtn").css("display","");
+}
+
 var clickNum = 0;
 var activeFlag = false;
 $(document).ready(function() {
 	$("#tittle").click(function() {
 		clickNum += 1;
 		if (clickNum >= 6) {
+			clickNum = 0;
 			var msg = "已激活隐藏功能,刷新网页/初始化工具后失效";
 			alert(msg);
 			console.log(msg);
-			activeFlag = true;
-			clickNum = 0;
+			unhideFn();
 		}
 	});
 });
+$("#origin_url_box").ready(function(){
+	var oub = $("#origin_url_box");
+	var initvalue = "请输入http、https、thunder、Fastget、qqdl开头的地址";
+	oub.val(initvalue);
+	oub.css("color", "gray");
+	oub.focus(function() {
+		if (oub.val() === initvalue) {
+			oub.val("");
+			oub.css("color", "")
+		}
+	});
+	oub.blur(function() {
+		if (!oub.val()) {
+			oub.val(initvalue);
+			oub.css("color", "gray");
+		}
+	});
+	
+	var queryLink=fromUrl("on,url,to");
+	if(queryLink["on"]===""){
+		console.log("已激活隐藏功能,初始化工具后失效");
+		unhideFn();
+	}
+	if(queryLink["url"]){
+		oub.val(queryLink["url"]);
+		oub.css("color", "");
+		setTimeout(function(){//延时500ms后再执行
+			switch (queryLink["to"]){
+				case "real":
+				case "short":
+				case "thunder":
+				case "flashget":
+				case "qqdl":
+					changeUrl(queryLink["to"]);
+					break;
+				default:
+					changeUrl("real");
+					break;
+			}
+		},500)	
+	}
+})
