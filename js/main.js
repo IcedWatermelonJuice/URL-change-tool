@@ -198,7 +198,7 @@ function initTool() {
 	var msg = "转换工具初始化";
 	if (activeFlag) {
 		msg += ",隐藏功能已失效"
-		activeFlag = false;
+		unhideFn(false);
 	}
 	console.log(msg);
 	alert(msg);
@@ -263,11 +263,17 @@ function fromUrl(keys){
 		return res;
 	}
 }
-//激活隐藏功能
-function unhideFn(){
-	activeFlag = true;
-	$("#playBtn").css("display","");
-	$("#dnsBtn").css("display","");
+//隐藏功能
+function unhideFn(flag){
+	if(flag){
+		activeFlag = true;
+		$("#playBtn").css("display","");
+		$("#dnsBtn").css("display","");
+	}else{
+		activeFlag = false;
+		$("#playBtn").css("display","none");
+		$("#dnsBtn").css("display","none");
+	}
 }
 
 var clickNum = 0;
@@ -280,7 +286,7 @@ $(document).ready(function() {
 			var msg = "已激活隐藏功能,刷新网页/初始化工具后失效";
 			alert(msg);
 			console.log(msg);
-			unhideFn();
+			unhideFn(true);
 		}
 	});
 });
@@ -305,7 +311,7 @@ $("#origin_url_box").ready(function(){
 	var queryLink=fromUrl("on,url,to");
 	if(queryLink["on"]===""){
 		console.log("已激活隐藏功能,初始化工具后失效");
-		unhideFn();
+		unhideFn(true);
 	}
 	if(queryLink["url"]){
 		oub.val(queryLink["url"]);
