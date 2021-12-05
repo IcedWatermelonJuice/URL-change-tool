@@ -19,24 +19,6 @@
 				<p>
 					<span>输入地址: </span>
 					<input type="text" id="origin_url_box" class="url_box" />
-					<script>
-						var oub = $("#origin_url_box");
-						var initvalue = "请输入http、https、thunder、Fastget、qqdl开头的地址";
-						oub.val(initvalue);
-						oub.css("color", "gray");
-						oub.focus(function() {
-							if (oub.val() === initvalue) {
-								oub.val("");
-								oub.css("color", "")
-							}
-						});
-						oub.blur(function() {
-							if (!oub.val()) {
-								oub.val(initvalue);
-								oub.css("color", "gray");
-							}
-						});
-					</script>
 				</p>
 				<p style="display: flex;">
 					<span>转换方向: </span>
@@ -54,7 +36,9 @@
 					<span>运行状态: </span>
 					<span id="run_state">未运行</span>
 					<button onclick="copyUrl()" id="copyBtn" style="display: none;">复制结果</button>
-					<button onclick="initTool()">初始化工具</button>
+					<button onclick="initTool()" id="initBtn" >初始化工具</button>
+					<button onclick="jumpSite('play')" id="playBtn" style="display: none;">在线播放</button>
+					<button onclick="jumpSite('dns')" id="dnsBtn" style="display: none;">DNS解析</button>
 				</p>
 
 			</div>
