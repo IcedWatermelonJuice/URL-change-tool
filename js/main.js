@@ -1,334 +1,520 @@
-//反馈运行状态
-function echoState(str, fcolor) {
-	var runState = $("#run_state");
-	runState.text(str);
-	try {
-		if (fcolor) {
-			runState.css("color", fcolor);
-		} else {
-			runState.css("color", "");
-		}
-
-	} catch (e) {
-		console.log(echoState颜色设置错误);
-	}
-
-}
-//解码迅雷
-function thunderDecode(url) {
-	url = url.replace('thunder://', '');
-	var res = atob(url);
-	res = res.substr(2, res.length - 4);
-	return res;
-}
-//解码快车
-function flashgetDecode(url) {
-	url = url.replace('Flashget://', '');
-	if (url.search('&') != -1) {
-		url = url.substr(0, url.search('&'));
-	}
-	var res = atob(url);
-	res = res.replace('[FLASHGET]', '');
-	res = res.replace('[FLASHGET]', ''); //两层[FLASHGET]都要去掉
-	return res;
-}
-//解码Q旋
-function qqdlDecode(url) {
-	url = url.replace('qqdl://', '');
-	var res = atob(url);
-	return res;
-}
-//编码真实
-function realEncode(url) {
-	if (url.search("thunder://") != -1) {
-		realUrl = thunderDecode(url);
-	} else if (url.search("Flashget://") != -1) {
-		realUrl = flashgetDecode(url);
-	} else if (url.search("qqdl://") != -1) {
-		realUrl = qqdlDecode(url);
-	} else {
-		realUrl = url;
-	}
-	return realUrl;
-}
-//编码短链
-function shortEncode(url) {
-	var shortInterFace = "xnz.pub/apis.php?url="; //短链接口
-	var shortUrl;
-	var protocol=/http|https/i.test(location.protocol)?location.protocol:"https:";
-	shortInterFace=protocol+"//"+shortInterFace.replace(/^((http|https):)?\/\//,"");
-	$.ajax({
-		type: "get",
-		url: shortInterFace + url,
-		async: false, //必须同步执行
-		error: function(xhr) {
-			alert("短链接口错误!\n" + "错误代码:" + xhr.status + "\n错误提示:" + xhr.statusText + "\n请联系开发者更换短链接口");
-			shortUrl = false;
-		},
-		success: function(res) {
-			if (typeof res === "string") {
-				res = JSON.parse(res); //防止get到的数据不是json格式
+var tool = {
+	echoState: function(str, fcolor) { //反馈运行状态
+		var runState = $("#run_state");
+		runState.text(str);
+		try {
+			if (fcolor) {
+				runState.css("color", fcolor);
+			} else {
+				runState.css("color", "");
 			}
-			shortUrl = "https://xnz.pub/" + res.result.shorten;
-		}
-	})
-	return shortUrl
-}
-//编码迅雷
-function thunderEncode(url) {
-	var thunderUrl = "thunder://" + btoa("AA" + url + "ZZ");
-	return thunderUrl;
-}
-//编码快车
-function flashgetEncode(url) {
-	var flashgetUrl = 'Flashget://' + btoa('[FLASHGET]' + url + '[FLASHGET]') + '&1926';
-	return flashgetUrl;
-}
-//编码Q旋
-function qqdlEncode(url) {
-	var qqdlUrl = 'qqdl://' + btoa(url);
-	return qqdlUrl;
-}
-//猫咪转译
-function maomiConvert(url) {
-	if (url.search("mmxzxl1.com") !== -1) {
-		var msg = "检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
-		var c_res = confirm(msg);
-		if (c_res) {
-			var flag0 = url.search("maomi/") + "maomi/".length;
-			var flag1 = url.lastIndexOf("/");
-			var newUrl = url.slice(flag0, flag1);
-			newUrl = "https://s2s.baimi0517.com/common/maomi/" + newUrl + "/hls/1/index.m3u8";
-			return newUrl;
-		}
-	}
-	return url;
-}
-//URL检错
-function checkUrl(url) {
-	var resFlag = false;
-	var resUrl = "";
-	if (url.search("https://") === 0) {
-		resFlag = true;
-		resUrl = url;
-	} else if (url.search("http://") === 0) {
-		resFlag = true;
-		resUrl = url;
-	} else if (url.search("thunder://") === 0) {
-		resFlag = true;
-		resUrl = url;
-	} else if (url.search("Flashget://") === 0) {
-		resFlag = true;
-		resUrl = url;
-	} else if (url.search("qqdl://") === 0) {
-		resFlag = true;
-		resUrl = url;
-	} else if (url.search("QUFodHRw") === 0) {
-		resFlag = true;
-		resUrl = "thunder://" + url;
-	} else if (url.search("W0ZMQVNIR0VUXWh0dH") === 0) {
-		resFlag = true;
-		resUrl = "Flashget://" + url;
-	} else if (url.search("aHR0c") === 0) {
-		resFlag = true;
-		resUrl = "qqdl://" + url;
-	}
-	return [resFlag, resUrl];
-}
-//转换URL
-function changeUrl(mode) {
-	echoState("转换中");
-	var origin_url = $("#origin_url_box").val();
-	origin_url = origin_url.trim();
-	var checkRes = checkUrl(origin_url);
-	echoState("转换中.");
-	if (checkRes[0]) {
-		var realUrl = realEncode(checkRes[1]);
-		if (activeFlag) {
-			realUrl = maomiConvert(realUrl);
-		}
-		echoState("转换中..");
-		var res_url = "";
-		switch (mode) {
-			case "real":
-				res_url = realUrl;
-				break;
-			case "short":
-				res_url = shortEncode(realUrl);
-				break;
-			case "thunder":
-				res_url = thunderEncode(realUrl);
-				break;
-			case "flashget":
-				res_url = flashgetEncode(realUrl);
-				break;
-			case "qqdl":
-				res_url = qqdlEncode(realUrl);
-				break;
-			default:
-				echoState("转换失败(转换模式错误,请刷新页面或反馈给开发者)!", "red");
-				return false;
-		}
-		echoState("转换中...");
-		if (typeof res_url === "string") {
-			$("#res_url_box").val(res_url);
-			console.log("输入地址:" + origin_url + "\n转换结果:" + res_url);
-			echoState("转换成功!", "green");
-			$("#copyBtn").css("display", "");
-		} else {
-			echoState("转换失败!", "red");
-		}
 
-	} else {
-		echoState("转换失败(输入地址错误)!", "red");
-	}
-}
-//复制到剪贴板
-function copyUrl() {
-	$("#res_url_box").select();
-	document.execCommand('copy');
-	alert("已复制到剪贴板!");
-}
-//初始化工具
-function initTool() {
-	$("#origin_url_box").val("请输入http、https、thunder、Fastget、qqdl开头的地址");
-	$("#origin_url_box").css("color", "gray");
-	$("#res_url_box").val("");
-	$("#copyBtn").css("display", "none");
-	var msg = "转换工具初始化";
-	if (activeFlag) {
-		msg += ",隐藏功能已失效"
-		unhideFn(false);
-	}
-	console.log(msg);
-	alert(msg);
-	echoState("未运行");
-}
-//跳转到其他网页
-function jumpSite(url){
-	if(!activeFlag){
-		return false;
-	}
-	var errorMsg;
-	switch (url){
-		case "play":
-			errorMsg="1、请先转换为真实地址再点击在线播放\n2、在线播放仅支持m3u8、flv、mp4、webm、ogg格式";
-			url="https://icedwatermelonjuice.github.io/Online-Player?url=";
-			let videoUrl=$("#res_url_box").val();
-			url=/.(m3u8|flv|mp4|webm|ogg)/i.test(videoUrl)?url+videoUrl:"";
-			break;
-		case "dns":
-			errorMsg="1、请先转换为真实地址再点击DNS解析\n2、若转换为短链地址，解析结果为短链接口的DNS解析结果";
-			url="https://icedwatermelonjuice.github.io/DND-Parse?url=";
-			let siteUrl=$("#res_url_box").val();
-			url=!/^(thunder|Flashget|qqdl):\/\//i.test(siteUrl)?url+siteUrl:"";
-			break;
-		default:
-			errorMsg="jumpSite(url)参数缺失或错误";
-			url=url.trim();
-			break;
-	}
-	if(url){
-		open(url);
-	}else{
-		alert(errorMsg);
-		console.log(errorMsg);
-	}
-}
-//从URL获取数据
-function fromUrl(keys){
-	if(!keys||typeof keys!=="string"){
-		return false;
-	}
-	var queryData=location.search;
-	if(!queryData){
-		return false;
-	}
-	queryData=queryData.slice(1).split("&");
-	var queryJson={};
-	for(let i in queryData){
-		let dataArray=queryData[i].split("=");
-		if(dataArray[0]){
-			queryJson[dataArray[0]]=dataArray[1]?dataArray[1]:"";
+		} catch (e) {
+			console.log(echoState颜色设置错误);
 		}
-	}
-	keys=keys.split(",");
-	if(keys.length===1){
-		return queryJson[keys[0]];
-	}else{
-		var res={};
-		for(let i in keys){
-			res[keys[i]]=queryJson[keys[i]];
+	},
+	checkUrl: function(url) { //URL检错
+		var res = "";
+		if (/^(https|http|thunder|Flashget|qqdl):\/\//i.test(url)) {
+			res = url;
+		} else if (/^QUFodHRw/i.test(url)) {
+			res = "thunder://" + url;
+		} else if (/^W0ZMQVNIR0VUXWh0dH/i.test(url)) {
+			res = "Flashget://" + url;
+		} else if (/^aHR0c/i.test(url)) {
+			res = "qqdl://" + url;
 		}
 		return res;
-	}
-}
-//隐藏功能
-function unhideFn(flag){
-	if(flag){
-		activeFlag = true;
-		$("#playBtn").css("display","");
-		$("#dnsBtn").css("display","");
-	}else{
-		activeFlag = false;
-		$("#playBtn").css("display","none");
-		$("#dnsBtn").css("display","none");
-	}
-}
-
-var clickNum = 0;
-var activeFlag = false;
-$(document).ready(function() {
-	$("#tittle").click(function() {
-		clickNum += 1;
-		if (clickNum >= 6) {
-			clickNum = 0;
-			var msg = "已激活隐藏功能,刷新网页/初始化工具后失效";
-			alert(msg);
-			console.log(msg);
-			unhideFn(true);
-		}
-	});
-});
-$("#origin_url_box").ready(function(){
-	var oub = $("#origin_url_box");
-	var initvalue = "请输入http、https、thunder、Fastget、qqdl开头的地址";
-	oub.val(initvalue);
-	oub.css("color", "gray");
-	oub.focus(function() {
-		if (oub.val() === initvalue) {
-			oub.val("");
-			oub.css("color", "")
-		}
-	});
-	oub.blur(function() {
-		if (!oub.val()) {
-			oub.val(initvalue);
-			oub.css("color", "gray");
-		}
-	});
-	
-	var queryLink=fromUrl("on,url,to");
-	if(queryLink["on"]===""){
-		console.log("已激活隐藏功能,初始化工具后失效");
-		unhideFn(true);
-	}
-	if(queryLink["url"]){
-		oub.val(queryLink["url"]);
-		oub.css("color", "");
-		setTimeout(function(){//延时500ms后再执行
-			switch (queryLink["to"]){
+	},
+	changeUrl: function(mode) { //URL转换
+		tool.echoState("转换中");
+		var origin_url = $("#origin_url_box").val();
+		origin_url = origin_url.trim();
+		var checkRes = tool.checkUrl(origin_url);
+		tool.echoState("转换中.");
+		if (checkRes) {
+			var realUrl = decode.real(checkRes);
+			if (activeFlag) {
+				realUrl = decode.maomi(realUrl);
+			}
+			tool.echoState("转换中..");
+			var res_url = "";
+			switch (mode) {
 				case "real":
+					res_url = realUrl;
+					break;
 				case "short":
+					res_url = encode.short(realUrl);
+					break;
 				case "thunder":
+					res_url = encode.thunder(realUrl);
+					break;
 				case "flashget":
+					res_url = encode.flashget(realUrl);
+					break;
 				case "qqdl":
-					changeUrl(queryLink["to"]);
+					res_url = encode.qqdl(realUrl);
 					break;
 				default:
-					changeUrl("real");
-					break;
+					tool.echoState("转换失败(转换模式错误,请刷新页面或反馈给开发者)!", "red");
+					return false;
 			}
-		},500)	
+			tool.echoState("转换中...");
+			if (typeof res_url === "string") {
+				$("#res_url_box").val(res_url);
+				console.log("输入地址:" + origin_url + "\n转换结果:" + res_url);
+				log.add(origin_url, res_url, mode);
+				tool.echoState("转换成功!", "green");
+				$("#copyBtn").css("display", "");
+			} else {
+				tool.echoState("转换失败!", "red");
+			}
+
+		} else {
+			tool.echoState("转换失败(输入地址错误)!", "red");
+		}
+	},
+	copyUrl: function() { //URL复制到剪贴板
+		$("#res_url_box").select();
+		document.execCommand('copy');
+		alert("已复制到剪贴板!");
+	},
+	initTool: function() { //初始化工具
+		$("#origin_url_box").val("请输入http、https、thunder、Fastget、qqdl开头的地址");
+		$("#origin_url_box").css("color", "gray");
+		$("#res_url_box").val("");
+		$("#copyBtn").css("display", "none");
+		var msg = "转换工具初始化";
+		if (activeFlag) {
+			msg += ",隐藏功能已失效"
+			tool.unhideFn(false);
+		}
+		console.log(msg);
+		alert(msg);
+		tool.echoState("未运行");
+	},
+	jumpSite: function(url, extraUrl) { //跳转到其他网页
+		if (!activeFlag) {
+			return false;
+		}
+		var errorMsg;
+		switch (url) {
+			case "play":
+				errorMsg = "1、请先转换为真实地址再点击在线播放\n2、在线播放仅支持m3u8、flv、mp4、webm、ogg格式";
+				url = "https://icedwatermelonjuice.github.io/Online-Player?url=";
+				if (!extraUrl || typeof extraUrl !== "string") {
+					extraUrl = $("#res_url_box").val();
+				}
+				url = /.(m3u8|flv|mp4|webm|ogg)/i.test(extraUrl) ? url + extraUrl : "";
+				break;
+			case "dns":
+				errorMsg = "1、请先转换为真实地址再点击DNS解析\n2、若转换为短链地址，解析结果为短链接口的DNS解析结果";
+				url = "https://icedwatermelonjuice.github.io/DND-Parse?url=";
+				if (!extraUrl || typeof extraUrl !== "string") {
+					extraUrl = $("#res_url_box").val();
+				}
+				url = !/^(thunder|Flashget|qqdl):\/\//i.test(extraUrl) ? url + extraUrl : "";
+				break;
+			default:
+				errorMsg = "jumpSite(url)参数缺失或错误";
+				url = url.trim();
+				break;
+		}
+		if (url) {
+			open(url);
+		} else {
+			alert(errorMsg);
+			console.log(errorMsg);
+		}
+	},
+	fromUrl: function(keys) { //从URL获取search数据
+		if (!keys || typeof keys !== "string") {
+			return false;
+		}
+		var queryData = location.search;
+		if (!queryData) {
+			return false;
+		}
+		queryData = queryData.slice(1).split("&");
+		var queryJson = {};
+		for (let i in queryData) {
+			let dataArray = queryData[i].split("=");
+			if (dataArray[0]) {
+				queryJson[dataArray[0]] = dataArray[1] ? dataArray[1] : "";
+			}
+		}
+		keys = keys.split(",");
+		if (keys.length === 1) {
+			return queryJson[keys[0]];
+		} else {
+			var res = {};
+			for (let i in keys) {
+				res[keys[i]] = queryJson[keys[i]];
+			}
+			return res;
+		}
+	},
+	unhideFn: function(flag) { //隐藏功能
+		if (flag) {
+			page.activeInstruct();
+			activeFlag = true;
+			$("#playBtn").css("display", "");
+			$("#dnsBtn").css("display", "");
+		} else {
+			page.activeHide();
+			activeFlag = false;
+			$("#playBtn").css("display", "none");
+			$("#dnsBtn").css("display", "none");
+		}
+	},
+}
+var instruct = {
+	list: {
+		"log": {
+			"descript": "显示历史记录",
+			"on": function() {
+				log.display();
+			}
+		},
+		"clear": {
+			"descript": "清空历史记录",
+			"on": function() {
+				log.clear();
+			}
+		},
+		"delete": {
+			"descript": "删除历史记录",
+			"on": function() {
+				var index = prompt("输入记录标号，删除历史记录，多条记录用英文“,”隔开");
+				index = index ? index.trim() : "";
+				if (index) {
+					index = index.split(",");
+					let temp = [];
+					for (let i in index) {
+						index[i] = index[i].trim();
+						if (index[i]) {
+							temp.push(parseInt(index[i]));
+						}
+					}
+					index = temp;
+					var max;
+					for (let i = 0; i < index.length; i++) {
+						for (let j = i; j < index.length; j++) {
+							if (index[i] < index[j]) {
+								max = index[j];
+								index[j] = index[i];
+								index[i] = max;
+							}
+						}
+					} //重排下index，由大到小，这样删数据，大下标的数据没了不影响小下标的值
+					for (let i in index) {
+						log.delete(index[i]);
+					}
+				} else {
+					alert("找不到记录");
+				}
+			}
+		},
+		"edit": {
+			"descript": "修改历史记录",
+			"on": function() {
+				var index = prompt("输入记录标号，选择一条记录");
+				if (index) {
+					log.edit(index);
+				}
+			}
+		},
+		"select": {
+			"descript": "从历史记录中挑选一项记录的输入地址，填充进“输入地址”框",
+			"on": function() {
+				var index = prompt("输入记录标号，选择一条记录");
+				if (index) {
+					log.select(index);
+				}
+			}
+		},
+		"help": {
+			"descript": "显示所有可用指令和可用指令功能描述",
+			"on": function() {
+				var msg = "指令列表：";
+				var list = instruct.list;
+				var i = 0;
+				for (let j in list) {
+					i += 1;
+					msg += "\n(" + i + ") " + j + " : " + list[j].descript;
+				}
+				alert(msg);
+			}
+		},
+		"jump": {
+			"descript": "跳转到其他网页",
+			"on": function() {
+				var url = prompt("请输入跳转目标地址");
+				url = typeof url === "string" ? url.trim().split(",") : "";
+				tool.jumpSite(url[0], url[1]);
+			}
+		},
+		"hide": {
+			"descript": "将隐藏功能关闭（注意：关闭隐藏功能将导致指令不可用）",
+			"on": function() {
+				tool.unhideFn(false);
+			}
+		},
+	},
+	execute: function(instruction) {
+		instruction = typeof instruction === "string" ? instruction.trim() : "";
+		if (!instruction) {
+			return false;
+		}
+		if (/^(js|javascript):/i.test(instruction)) {
+			instruction = instruction.slice(instruction.search(":") + 1);
+			this.eval(instruction);
+		} else {
+			this.brief(instruction);
+		}
+	},
+	brief: function(instruction) {
+		instruction = this.list[instruction];
+		if (instruction) {
+			instruction.on();
+		} else {
+			alert("非法指令！");
+		}
+	},
+	eval: function(instruction) {
+		try {
+			eval(instruction);
+		} catch (e) {
+			alert("指令错误！\n" + e);
+		}
 	}
-})
+}
+var log = {
+	get: function() {
+		var localLog = localStorage.getItem("runningLog");
+		localLog = typeof localLog === "string" ? localLog.trim() : "";
+		try {
+			localLog = localLog ? JSON.parse(localLog) : [];
+		} catch (e) {
+			localLog = [];
+		}
+		return typeof localLog === "object" ? localLog : [];
+	},
+	add: function(origin_url, target_url, direction, time) {
+		if (!origin_url || !target_url || !direction) {
+			console.log(
+				"log.save(origin_url,target_url,direction,time)参数缺失:origin_url、target_url、direction必选，time可选"
+			);
+		}
+		time = time ? time : Date();
+		var tempLog = this.get();
+		tempLog.unshift({
+			"origin": origin_url,
+			"target": target_url,
+			"direction": direction,
+			"time": time
+		})
+		console.log(this.get());
+		console.log(tempLog);
+		localStorage.setItem("runningLog", JSON.stringify(tempLog));
+	},
+	display: function() {
+		var tempLog = this.get();
+		var msg = "";
+		for (let i in tempLog) {
+			msg += "\n(" + (parseInt(i) + 1) + ")\n转换方向: " + tempLog[i].direction + "\n输入地址: " + tempLog[i]
+				.origin + "\n转换结果: " + tempLog[i].target + "\n转换时间: " + tempLog[i].time;
+		}
+		msg = msg ? "运行日志：" + msg : "无运行日志";
+		console.log(msg);
+		alert(msg);
+	},
+	clear: function() {
+		localStorage.removeItem("runningLog");
+	},
+	delete: function(index) {
+		var tempLog = this.get();
+		if (tempLog[index - 1]) {
+			tempLog.splice(index - 1, 1);
+			localStorage.setItem("runningLog", JSON.stringify(tempLog));
+		} else {
+			alert("找不到对应记录");
+		}
+	},
+	edit: function(index) {
+		var tempLog = this.get();
+		if (tempLog[index - 1]) {
+			let newLog = JSON.stringify(tempLog[index - 1]);
+			newLog = prompt("请修改数据\n点击确认保存修改，点击取消退出修改", newLog);
+			if (newLog) {
+				try {
+					newLog = JSON.parse(newLog); //确保修改后JSON格式正确
+				} catch (e) {
+					alert("JSON格式错误");
+					return false;
+				}
+				tempLog[index - 1] = newLog;
+				localStorage.setItem("runningLog", JSON.stringify(tempLog));
+			}
+		} else {
+			alert("找不到对应记录");
+		}
+	},
+	select: function(index) {
+		var tempLog = this.get();
+		if (tempLog[index - 1]) {
+			$("#origin_url_box").val(tempLog[index - 1].origin);
+			$("#origin_url_box").css("color", "");
+		} else {
+			alert("找不到对应记录");
+		}
+	}
+}
+var encode = {
+	thunder: function(url) { //编码迅雷
+		return "thunder://" + btoa("AA" + url + "ZZ");
+	},
+	flashget: function(url) { //编码快车
+		return 'Flashget://' + btoa('[FLASHGET]' + url + '[FLASHGET]') + '&1926';
+	},
+	qqdl: function(url) { //编码Q旋
+		return 'qqdl://' + btoa(url);
+	},
+	short: function(url) { //编码短链
+		var shortInterFace = "xnz.pub/apis.php?url="; //短链接口
+		var shortUrl;
+		var protocol = /http|https/i.test(location.protocol) ? location.protocol : "https:";
+		shortInterFace = protocol + "//" + shortInterFace.replace(/^((http|https):)?\/\//, "");
+		$.ajax({
+			type: "get",
+			url: shortInterFace + url,
+			async: false, //必须同步执行
+			error: function(xhr) {
+				alert("短链接口错误!\n" + "错误代码:" + xhr.status + "\n错误提示:" + xhr.statusText +
+					"\n请联系开发者更换短链接口");
+				shortUrl = false;
+			},
+			success: function(res) {
+				if (typeof res === "string") {
+					res = JSON.parse(res); //防止get到的数据不是json格式
+				}
+				shortUrl = "https://xnz.pub/" + res.result.shorten;
+			}
+		})
+		return shortUrl
+	}
+}
+var decode = {
+	thunder: function(url) { //解码迅雷
+		url = atob(url.replace('thunder://', ''));
+		return url.substr(2, res.length - 4);
+	},
+	flashget: function(url) { //解码快车
+		url = url.replace('Flashget://', '').split('&')[0];
+		return atob(url).replace('[FLASHGET]', '').replace('[FLASHGET]', ''); //两层[FLASHGET]都要去掉
+	},
+	qqdl: function(url) { //解码Q旋
+		return atob(url.replace('qqdl://', ''));
+	},
+	real: function(url) { //解码真实
+		if (url.search("thunder://") != -1) {
+			url = this.thunder(url);
+		} else if (url.search("Flashget://") != -1) {
+			url = this.flashget(url);
+		} else if (url.search("qqdl://") != -1) {
+			url = this.qqdl(url);
+		}
+		return url;
+	},
+	maomi: function(url) { //解码猫咪
+		if (url.search("www.mmxzxl1.com") !== -1) {
+			var msg = "检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
+			if (confirm(msg)) {
+				url = url.replace("www.mmxzxl1.com", "s2s.baimi0517.com");
+				url = url.slice(0, url.lastIndexOf("/")) + "/hls/1/index.m3u8";
+			}
+		}
+		return url;
+	}
+}
+var page = {
+	activeHide: function() {
+		clickNum = 0;
+		$("#tittle").off("click");
+		$("#tittle").on("click", function() {
+			clickNum += 1;
+			if (clickNum >= 6) {
+				clickNum = 0;
+				var msg = "已激活隐藏功能,刷新网页/初始化工具后失效";
+				alert(msg);
+				console.log(msg);
+				tool.unhideFn(true);
+			}
+		})
+	},
+	activeInstruct: function() {
+		clickNum = 0;
+		$("#tittle").off("click");
+		$("#tittle").on("click", function() {
+			clickNum += 1;
+			if (clickNum >= 3) {
+				clickNum = 0;
+				instruct.execute(prompt("请输入指令"));
+			}
+		})
+	},
+	initPage: function() {
+		var oub = $("#origin_url_box");
+		var initvalue = "请输入http、https、thunder、Fastget、qqdl开头的地址";
+		oub.val(initvalue);
+		oub.css("color", "gray");
+		oub.focus(function() {
+			if (oub.val() === initvalue) {
+				oub.val("");
+				oub.css("color", "")
+			}
+		});
+		oub.blur(function() {
+			if (!oub.val()) {
+				oub.val(initvalue);
+				oub.css("color", "gray");
+			}
+		});
+	},
+	pretreatUrl: function() {
+		var oub = $("#origin_url_box");
+		var queryLink = tool.fromUrl("on,url,to");
+		if (queryLink["on"] === "") {
+			console.log("已激活隐藏功能,初始化工具后失效");
+			tool.unhideFn(true);
+		}
+		if (queryLink["url"]) {
+			oub.val(queryLink["url"]);
+			oub.css("color", "");
+			setTimeout(function() { //延时500ms后再执行
+				switch (queryLink["to"]) {
+					case "real":
+					case "short":
+					case "thunder":
+					case "flashget":
+					case "qqdl":
+						tool.changeUrl(queryLink["to"]);
+						break;
+					default:
+						tool.changeUrl("real");
+						break;
+				}
+			}, 500)
+		}
+	},
+	on: function() {
+		$(document).ready(function() {
+			page.initPage();
+			page.activeHide();
+			page.pretreatUrl();
+		})
+	}
+}
+var clickNum = 0;
+var activeFlag = false;
+page.on();
