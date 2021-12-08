@@ -101,7 +101,8 @@ var tool = {
 		switch (url) {
 			case "play":
 				errorMsg = "1、请先转换为真实地址再点击在线播放\n2、在线播放仅支持m3u8、flv、mp4、webm、ogg格式";
-				url = "https://icedwatermelonjuice.github.io/Online-Player?url=";
+				url = location.hostname.search(".rth.") === -1 ?
+					"https://icedwatermelonjuice.github.io/Online-Player?url=" : "https://gem-op.rth.app?url=";
 				if (!extraUrl || typeof extraUrl !== "string") {
 					extraUrl = $("#res_url_box").val();
 				}
@@ -109,7 +110,8 @@ var tool = {
 				break;
 			case "dns":
 				errorMsg = "1、请先转换为真实地址再点击DNS解析\n2、若转换为短链地址，解析结果为短链接口的DNS解析结果";
-				url = "https://icedwatermelonjuice.github.io/DND-Parse?url=";
+				url = location.hostname.search(".rth.") === -1 ?
+					"https://icedwatermelonjuice.github.io/DND-Parse?url=" : "https://gem-dp.rth.app?url=";
 				if (!extraUrl || typeof extraUrl !== "string") {
 					extraUrl = $("#res_url_box").val();
 				}
