@@ -18,15 +18,15 @@
 			<div id="main">
 				<p>
 					<span>输入地址: </span>
-					<input type="text" id="origin_url_box" class="url_box" />
+					<input type="text" id="origin_url_box" autocomplete="off" class="url_box" />
 				</p>
 				<p style="display: flex;">
 					<span>转换方向: </span>
-					<button onclick="changeUrl('real')">原始地址</button>
-					<button onclick="changeUrl('short')">短链地址</button>
-					<button onclick="changeUrl('thunder')">迅雷地址</button>
-					<button onclick="changeUrl('flashget')">快车地址</button>
-					<button onclick="changeUrl('qqdl')">Q旋地址</button>
+					<button onclick="tool.changeUrl('real')">原始地址</button>
+					<button onclick="tool.changeUrl('short')">短链地址</button>
+					<button onclick="tool.changeUrl('thunder')">迅雷地址</button>
+					<button onclick="tool.changeUrl('flashget')">快车地址</button>
+					<button onclick="tool.changeUrl('qqdl')">Q旋地址</button>
 				</p>
 				<p>
 					<span>转换结果: </span>
@@ -35,10 +35,10 @@
 				<p style="display: flex;">
 					<span>运行状态: </span>
 					<span id="run_state">未运行</span>
-					<button onclick="copyUrl()" id="copyBtn" style="display: none;">复制结果</button>
-					<button onclick="initTool()" id="initBtn" >初始化工具</button>
-					<button onclick="jumpSite('play')" id="playBtn" style="display: none;">在线播放</button>
-					<button onclick="jumpSite('dns')" id="dnsBtn" style="display: none;">DNS解析</button>
+					<button onclick="tool.copyUrl()" id="copyBtn" style="display: none;">复制结果</button>
+					<button onclick="tool.initTool()" id="initBtn" >初始化工具</button>
+					<button onclick="tool.jumpSite('play')" id="playBtn" style="display: none;">在线播放</button>
+					<button onclick="tool.jumpSite('dns')" id="dnsBtn" style="display: none;">DNS解析</button>
 				</p>
 
 			</div>
