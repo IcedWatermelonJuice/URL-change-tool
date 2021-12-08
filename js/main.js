@@ -79,6 +79,16 @@ var tool = {
 		document.execCommand('copy');
 		alert("已复制到剪贴板!");
 	},
+	toClipboard: function(data, msg) {
+		var exportBox = document.createElement("input");
+		exportBox.value = data;
+		document.body.appendChild(exportBox);
+		exportBox.select();
+		document.execCommand('copy');
+		exportBox.remove();
+		msg = msg ? msg : "已导出到剪贴板";
+		alert(msg);
+	},
 	initTool: function() { //初始化工具
 		$("#origin_url_box").val("请输入http、https、thunder、Fastget、qqdl开头的地址");
 		$("#origin_url_box").css("color", "gray");
@@ -169,6 +179,78 @@ var tool = {
 			$("#dnsBtn").css("display", "none");
 		}
 	},
+	getTime: function() {
+		var time = new Date();
+		var year = time.toLocaleDateString().replace(/\//g, ".");
+		var hour = time.getHours();
+		var minute = time.getMinutes();
+		var second = time.getSeconds();
+		hour = hour < 10 ? "0" + hour : hour;
+		minute = minute < 10 ? "0" + minute : minute;
+		second = second < 10 ? "0" + second : second;
+		return year + " " + hour + ":" + minute + ":" + second;
+	}
+}
+var message = {
+	alert: function(data, title) {
+		title = title ? title.slice(0, 10) : "信息提示";
+		$("body").append(this.create("alert", data, title));
+	},
+	prompt: function(data, title) {
+		title = title ? title.slice(0, 10) : "信息收集"
+		$("body").append(this.create("prompt", data, title));
+	},
+	confirm: function(data, title) {
+		title = title ? title.slice(0, 10) : "信息确认"
+		$("body").append(this.create("confirm", data, title));
+	},
+	create: function(type, data, title) {
+		var content, tips;
+		if (typeof data === "string") {
+			tips = "";
+			content = "<p type='content'>" + data + "</p>";
+		} else {
+			tips = "<p type='tips' style='color:red'>" + data[0] + "</p>";
+			content = "<p type='content'>" + data[1] + "</p>";
+		}
+		var container = document.createElement("div");
+		var outerBox = document.createElement("div");
+		var innerBox = document.createElement("div");
+		var head = document.createElement("div");
+		var main = document.createElement("div");
+		var foot = document.createElement("div");
+		container.setAttribute("class", "message_container");
+		outerBox.setAttribute("class", "message_outerBox");
+		innerBox.setAttribute("class", "message_innerBox");
+		head.setAttribute("class", "message_head");
+		main.setAttribute("class", "message_main");
+		foot.setAttribute("class", "message_foot");
+		container.appendChild(outerBox);
+		outerBox.appendChild(innerBox);
+		innerBox.appendChild(head);
+		innerBox.appendChild(main);
+		innerBox.appendChild(foot);
+		head.innerHTML = title;
+		main.innerHTML = tips + content;
+		foot.innerHTML =
+			"<div class='message_button' type='copy' onclick='message.copy()'>全部复制</div><div class='message_button' type='close' onclick='message.close()'>关闭页面</div><div class='message_button' type='home' onclick='message.home()'>重输指令</div>";
+		return container;
+	},
+	copy: function() {
+		tool.toClipboard($(".message_main p[type=content]").html().replace(/<br>/g, " "));
+	},
+	submit: function() {
+		$(".message_container").remove();
+	},
+	close: function() {
+		$(".message_container").remove();
+	},
+	home: function() {
+		this.close();
+		setTimeout(function() {
+			instruct.execute(prompt("请输入指令"));
+		}, 500)
+	}
 }
 var instruct = {
 	list: {
@@ -238,14 +320,14 @@ var instruct = {
 		"help": {
 			"descript": "显示所有可用指令和可用指令功能描述",
 			"on": function() {
-				var msg = "指令列表：";
+				var msg = "";
 				var list = instruct.list;
 				var i = 0;
 				for (let j in list) {
 					i += 1;
-					msg += "\n(" + i + ") " + j + " : " + list[j].descript;
+					msg += "(" + i + ") " + j + " : " + list[j].descript + "<br>";
 				}
-				alert(msg);
+				message.alert(msg, "指令列表");
 			}
 		},
 		"jump": {
@@ -308,7 +390,7 @@ var log = {
 				"log.save(origin_url,target_url,direction,time)参数缺失:origin_url、target_url、direction必选，time可选"
 			);
 		}
-		time = time ? time : Date();
+		time = time ? time : tool.getTime();
 		var tempLog = this.get();
 		tempLog.unshift({
 			"origin": origin_url,
@@ -316,20 +398,18 @@ var log = {
 			"direction": direction,
 			"time": time
 		})
-		console.log(this.get());
-		console.log(tempLog);
+		tempLog = tempLog.slice(0, 50);
 		localStorage.setItem("runningLog", JSON.stringify(tempLog));
 	},
 	display: function() {
 		var tempLog = this.get();
 		var msg = "";
 		for (let i in tempLog) {
-			msg += "\n(" + (parseInt(i) + 1) + ")\n转换方向: " + tempLog[i].direction + "\n输入地址: " + tempLog[i]
-				.origin + "\n转换结果: " + tempLog[i].target + "\n转换时间: " + tempLog[i].time;
+			msg += "(" + (parseInt(i) + 1) + ")<br>转换方向: " + tempLog[i].direction + "<br>输入地址: " + tempLog[i]
+				.origin + "<br>转换结果: " + tempLog[i].target + "<br>转换时间: " + tempLog[i].time + "<br>";
 		}
-		msg = msg ? "运行日志：" + msg : "无运行日志";
-		console.log(msg);
-		alert(msg);
+		msg = msg ? msg : "无运行日志";
+		message.alert(["注意: 最多保留50条记录！", msg], "运行历史日志");
 	},
 	clear: function() {
 		localStorage.removeItem("runningLog");

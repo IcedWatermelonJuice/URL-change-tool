@@ -57,4 +57,5 @@ button {
 a {
 	text-decoration: none;
 	color: black;
+	word-wrap: break-word;
 }
