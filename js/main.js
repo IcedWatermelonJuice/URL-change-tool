@@ -66,6 +66,7 @@ var tool = {
 				log.add(origin_url, res_url, mode);
 				tool.echoState("转换成功!", "green");
 				$("#copyBtn").css("display", "");
+				$("#qrBtn").css("display", "");
 			} else {
 				tool.echoState("转换失败!", "red");
 			}
@@ -94,6 +95,7 @@ var tool = {
 		$("#origin_url_box").css("color", "gray");
 		$("#res_url_box").val("");
 		$("#copyBtn").css("display", "none");
+		$("#qrBtn").css("display", "none");
 		var msg = "转换工具初始化";
 		if (activeFlag) {
 			msg += ",隐藏功能已失效"
@@ -104,7 +106,7 @@ var tool = {
 		tool.echoState("未运行");
 	},
 	jumpSite: function(url, extraUrl) { //跳转到其他网页
-		if (!activeFlag) {
+		if (!activeFlag&&url!=="qrcode") {
 			return false;
 		}
 		var errorMsg;
@@ -126,6 +128,17 @@ var tool = {
 					extraUrl = $("#res_url_box").val();
 				}
 				url = !/^(thunder|Flashget|qqdl):\/\//i.test(extraUrl) ? url + extraUrl : "";
+				break;
+			case "qrcode":
+				console.log("qrcode")
+				errorMsg = "转换结果为空！";
+				url = location.hostname.search(".rth.") === -1 ?
+					"https://icedwatermelonjuice.github.io/QRcode-Tool?fullscreen=on&url=" :
+					"https://gem-qr.rth.app?fullscreen=on&url=";
+				if (!extraUrl || typeof extraUrl !== "string") {
+					extraUrl = $("#res_url_box").val();
+				}
+				url = extraUrl ? url + extraUrl : "";
 				break;
 			default:
 				errorMsg = "jumpSite(url)参数缺失或错误";
@@ -489,7 +502,7 @@ var encode = {
 var decode = {
 	thunder: function(url) { //解码迅雷
 		url = atob(url.replace('thunder://', ''));
-		return url.substr(2, res.length - 4);
+		return url.substr(2, url.length - 4);
 	},
 	flashget: function(url) { //解码快车
 		url = url.replace('Flashget://', '').split('&')[0];
