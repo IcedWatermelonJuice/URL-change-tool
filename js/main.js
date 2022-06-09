@@ -106,7 +106,7 @@ var tool = {
 		tool.echoState("未运行");
 	},
 	jumpSite: function(url, extraUrl) { //跳转到其他网页
-		if (!activeFlag&&url!=="qrcode") {
+		if (!activeFlag && url !== "qrcode") {
 			return false;
 		}
 		var errorMsg;
@@ -118,7 +118,7 @@ var tool = {
 				if (!extraUrl || typeof extraUrl !== "string") {
 					extraUrl = $("#res_url_box").val();
 				}
-				url = /.(m3u8|flv|mp4|webm|ogg)/i.test(extraUrl) ? url + extraUrl : "";
+				url = /.(m3u8|flv|mp4|webm|ogg)/i.test(extraUrl) ? url + encodeURIComponent(extraUrl) : "";
 				break;
 			case "dns":
 				errorMsg = "1、请先转换为真实地址再点击DNS解析\n2、若转换为短链地址，解析结果为短链接口的DNS解析结果";
@@ -127,7 +127,8 @@ var tool = {
 				if (!extraUrl || typeof extraUrl !== "string") {
 					extraUrl = $("#res_url_box").val();
 				}
-				url = !/^(thunder|Flashget|qqdl):\/\//i.test(extraUrl) ? url + extraUrl : "";
+				url = !/^(thunder|Flashget|qqdl):\/\//i.test(extraUrl) ? url + encodeURIComponent(extraUrl) :
+				"";
 				break;
 			case "qrcode":
 				console.log("qrcode")
@@ -138,7 +139,7 @@ var tool = {
 				if (!extraUrl || typeof extraUrl !== "string") {
 					extraUrl = $("#res_url_box").val();
 				}
-				url = extraUrl ? url + extraUrl : "";
+				url = extraUrl ? url + encodeURIComponent(extraUrl) : "";
 				break;
 			default:
 				errorMsg = "jumpSite(url)参数缺失或错误";
