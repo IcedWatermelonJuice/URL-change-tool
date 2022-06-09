@@ -483,7 +483,7 @@ var encode = {
 		shortInterFace = protocol + "//" + shortInterFace.replace(/^((http|https):)?\/\//, "");
 		$.ajax({
 			type: "get",
-			url: shortInterFace + url,
+			url: shortInterFace + encodeURIComponent(url),
 			async: false, //必须同步执行
 			error: function(xhr) {
 				alert("短链接口错误!\n" + "错误代码:" + xhr.status + "\n错误提示:" + xhr.statusText +
