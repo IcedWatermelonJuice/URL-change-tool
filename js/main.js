@@ -109,7 +109,7 @@ var tool = {
 		if (!activeFlag && url !== "qrcode") {
 			return false;
 		}
-		var errorMsg;
+		var errorMsg, postMsg;
 		switch (url) {
 			case "play":
 				errorMsg = "1、请先转换为真实地址再点击在线播放\n2、在线播放仅支持m3u8、flv、mp4、webm、ogg格式";
@@ -147,10 +147,23 @@ var tool = {
 				break;
 		}
 		if (url) {
-			if (tool.fromUrl("jump") === "self") {
-				location.href = url;
-			} else {
-				open(url);
+			postMsg = {
+				"url": url
+			};
+			switch (tool.fromUrl("jump")) {
+				case "self":
+					location.href = url;
+					break;
+				case "parent":
+					window.parent.postMessage(postMsg, "*");
+					break;
+				case "top":
+					window.top.postMessage(postMsg, "*");
+					break;
+				case "blank":
+				default:
+					open(url);
+					break;
 			}
 		} else {
 			alert(errorMsg);
