@@ -128,7 +128,7 @@ var tool = {
 					extraUrl = $("#res_url_box").val();
 				}
 				url = !/^(thunder|Flashget|qqdl):\/\//i.test(extraUrl) ? url + encodeURIComponent(extraUrl) :
-				"";
+					"";
 				break;
 			case "qrcode":
 				console.log("qrcode")
@@ -147,7 +147,11 @@ var tool = {
 				break;
 		}
 		if (url) {
-			open(url);
+			if (tool.fromUrl("jump") === "self") {
+				location.href = url;
+			} else {
+				open(url);
+			}
 		} else {
 			alert(errorMsg);
 			console.log(errorMsg);
