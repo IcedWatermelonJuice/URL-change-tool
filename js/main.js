@@ -543,7 +543,7 @@ var decode = {
 		if (url.search("www.mmxzxl1.com") !== -1) {
 			var msg = "检测到猫咪地址(海外链路),是否转换为国内链路?\nPS:国内链路还可以直接通过浏览器播放哟!";
 			if (confirm(msg)) {
-				url = url.replace("www.mmxzxl1.com", "s2s.baimi0517.com");
+				url = url.replace("www.mmxzxl1.com", "m3m.1vkx.cn");//s2s.baimi0517.com
 				url = url.slice(0, url.lastIndexOf("/")) + "/hls/1/index.m3u8";
 			}
 		}
